@@ -1,0 +1,169 @@
+# f = open("babyshark.txt", 'r')
+
+
+n = int(input())
+
+arr = []
+for i in range(n):
+    line = input().split()
+    # line = input().split()
+    line = list(map(int,line))
+
+    arr.append(line)
+
+# print(arr)
+
+
+
+# 상, 하 좌, 우
+# 한 면부터 차례대로 확인한다.
+def up_to_down(arr):
+    global n
+    for j in range(0, n):
+        flag = 0
+        full = 0
+        i = 0
+        while i < n:
+
+            ## 합칠 게 없을 때 flag == 0
+            if flag == 0 and arr[i][j] != 0:
+                flag = arr[i][j]
+
+            # 합칠 게 있을 때 flag != 0
+            elif flag and arr[i][j] == flag:
+                arr[full][j] = flag * 2
+                flag = 0
+                full += 1
+
+            elif flag and arr[i][j]:
+                arr[full][j] = flag
+                flag = arr[i][j]
+                full += 1
+            arr[i][j] = 0
+            i += 1
+        if flag:
+            arr[full][j] = flag
+    return arr
+
+def down_to_up(arr):
+    global n
+    for j in range(0, n):
+        flag = 0
+        full = n-1
+        i = n-1
+        while i >= 0:
+            ## 합칠 게 없을 때 flag == 0
+            if flag == 0 and arr[i][j] != 0:
+                flag = arr[i][j]
+
+            # 합칠 게 있을 때 flag != 0
+            elif flag and arr[i][j] == flag:
+                arr[full][j] = flag * 2
+                flag = 0
+                full -= 1
+            elif flag and arr[i][j]:
+                arr[full][j] = flag
+                flag = arr[i][j]
+                full -= 1
+            arr[i][j] = 0
+            i -= 1
+        if flag:
+            arr[full][j] = flag
+    return arr
+
+
+def left_to_right(arr):
+    global n
+
+    for i in range(0, n):
+        flag = 0
+        full = 0
+        j = 0
+        while j<n :
+            # 아무것도 매치가 되지 않은 경우
+            if flag == 0 and arr[i][j]!=0:
+                flag = arr[i][j]
+            # flag가 있고 매치가 된 경우
+            elif flag and arr[i][j] == flag:
+                arr[i][full] = flag *2
+                flag = 0
+                full += 1
+            # flag가 있고 매치가 되지 않은 경우
+            elif flag and arr[i][j]:
+                arr[i][full] = flag
+                flag = arr[i][j]
+                full += 1
+            arr[i][j] = 0
+            j += 1
+        if flag :
+            arr[i][full] = flag
+
+
+    return arr
+
+def right_to_left(arr):
+    global n
+    for i in range(0, n):
+        flag = 0
+        full = n-1
+        j = n-1
+        while j>=0 :
+            # 아무것도 매치가 되지 않은 경우
+            if flag == 0 and arr[i][j]!=0:
+                flag = arr[i][j]
+            # flag가 있고 매치가 된 경우
+            elif flag and arr[i][j] == flag:
+                arr[i][full] = flag *2
+                flag = 0
+                full -= 1
+            # flag가 있고 매치가 되지 않은 경우
+            elif flag and arr[i][j]:
+                arr[i][full] = flag
+                flag = arr[i][j]
+                full -= 1
+            arr[i][j] = 0
+            j -= 1
+
+        if flag:
+            arr[i][full] = flag
+    return arr
+
+list = [up_to_down, down_to_up, left_to_right, right_to_left]
+answer = 0
+# 최대 5번
+
+def pri(arr):
+    global n
+    for i in range(n):
+        print(arr[i])
+
+def dfs(arr,cnt):
+    global answer
+    global n
+    ## 5번 진행했다면 최댓값 찾기
+    # print(cnt)
+    # pri(arr)
+
+    if cnt == 5:
+        for i in range(n):
+            m = max(arr[i])
+            answer = max(m, answer)
+        return
+    for i in range(4):
+        # 배열 copy
+        arr_ = [[0 for _ in range(n)] for _ in range(n)]
+        for r in range(n):
+            for c in range(n):
+                arr_[r][c] = arr[r][c]
+        result = list[i](arr_)
+        dfs(result, cnt+1)
+
+
+
+cnt = 0
+dfs(arr, 0)
+# result = up_to_down(arr)
+# result = right_to_left(result)
+# pri(result)
+print(answer)
+# f.close()
