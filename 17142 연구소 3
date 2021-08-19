@@ -1,0 +1,114 @@
+from itertools import combinations
+from collections import deque
+
+# f = open("babyshark.txt", 'r')
+
+
+# n, k = f.readline().split()
+n,k = input().split()
+n = int(n)
+k = int(k)
+
+arr = []
+m = [[ 0 for _ in range(n)] for _ in range(n)]
+for i in range(n):
+    # line = f.readline().split()
+    line = input().split()
+    line = list(map(int,line))
+
+    arr.append(line)
+
+
+i_ = [0,0,-1,1]
+j_ = [1,-1,0,0]
+
+virus = []
+for i in range(n):
+    for j in range(n):
+        if arr[i][j] == 2:
+           virus.append((i,j))
+
+
+def pri(arr):
+    global n
+    for i in range(n):
+        print(arr[i])
+        
+# 조합으로 구현하기
+com = list(combinations(virus, k))
+
+# combination에 대해서 하나씩 virus spread 수행
+#
+# 바이러스에 대해 비활성 바이러스로의 전파는 시간을 추가하지 x. 이미 그 위치에 바이러스가 존재하는 것 
+# def spread()
+# 바이러스가 비활성바이러스가 있는 곳으로 가기 전에 dfs를 종료할 수 있다...
+def dfs(v_list):
+    global n
+    v = [[3000 for _ in range(n)] for _ in range(n)]
+
+    ## 선택한 바이러스는 0으로 초기화
+    queue = deque([])
+
+    for i in range(len(v_list)):
+        v[v_list[i][0]][v_list[i][1]] = 0
+        queue.append((v_list[i][0], v_list[i][1], 0))
+    # 초기화했으면 시간에 따라 spread bfs로 진행
+    # 이미 방문상태라면 더 탐색할 필요 x
+
+    # 벽에 대해서는 -1로 초기화
+    for i in range(n):
+        for j in range(n):
+            if arr[i][j] == 1:
+                v[i][j] = -1
+
+    # queue가 빌 때 까지
+    while queue:
+        now = queue.popleft()
+        r = now[0]
+        c = now[1]
+        time = now[2] + 1
+        #현재를 꺼내서 주변을 탐색 후, 다시 queue에 넣기
+
+        for k in range(4):
+            i = r+i_[k]
+            j = c+j_[k]
+
+            ## 벽일 경우 pass
+            if i<0 or j<0 or i>=n or j>=n or arr[i][j] == 1:
+                continue
+            ## 비활성 바이러스 일 경우
+            if arr[i][j] == 2 and v[i][j] > time-1:
+                v[i][j] = time
+                queue.append((i,j,time))
+
+            ## 빈 칸일 경우
+            elif v[i][j] > time :
+                v[i][j] = time
+                queue.append((i,j,time))
+
+    result = 0
+
+    for i in range(n):
+        for j in range(n):
+            if arr[i][j] == 2:
+                v[i][j] = 0
+
+    for i in range(n):
+        re = max(v[i])
+        result = max(re, result)
+    return result
+    # 만약 virus가 다 퍼지지 않았다면 return False
+    # 다 퍼졌다면 가장 긴 시간을 return
+answer = 3000
+for i in range(len(com)):
+    result = dfs(com[i])
+    answer = min(answer, result)
+
+# result = dfs(com[0])
+# print('result',result)
+
+if answer == 3000:
+    print(-1)
+else:
+    print(answer)
+# f.close()
