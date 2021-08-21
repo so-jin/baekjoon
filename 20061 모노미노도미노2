@@ -1,0 +1,214 @@
+# f = open("babyshark.txt", 'r')
+
+
+# k = int(f.readline())
+k = int(input())
+arr = []
+
+red = [[ 0 for _ in range(4)] for _ in range(4)]
+blue = [[0 for _ in range(6)] for _ in range(4)]
+green = [[0 for _ in range(4)] for _ in range(6)]
+score = 0
+def pri(arr):
+    for i in range(len(arr)):
+        print(arr[i])
+
+def down(j):
+    i = 0
+    while i+1<=5 and green[i+1][j] == 0 :
+        i+=1
+    return i
+
+def right(i):
+    # down 과 같은 일 하기
+    j = 0
+    while j+1<=5 and blue[i][j+1] == 0:
+        j+=1
+    return j
+
+def b_place(size, r, c):
+    global score
+    # 블록 놓기
+    if size == 1 :
+        j = right(r)
+        blue[r][j] = 1
+    # 세로
+    elif size == 3:
+        u_j = right(r)
+        d_j = right(r+1)
+
+        j = min(u_j, d_j)
+
+        blue[r][j] = 1
+        blue[r+1][j] = 1
+
+    ## 가로
+    else:
+        j = right(r)
+        blue[r][j-1] = 1
+        blue[r][j]=1
+
+    d_list = [False for _ in range(6)]
+
+    # 블록 지우고 점수 얻기
+    for j in range(5,1,-1):
+        flag = 1
+        for i in range(4):
+            if blue[i][j] == 0:
+                flag = 0
+                break
+        if flag == 1:
+            d_list[j] = True
+
+    for j in range(5,1,-1):
+        # 빈칸 2줄
+        if d_list[j] and d_list[j-1]:
+            while j-2>=0:
+                for i in range(4):
+                    blue[i][j] = blue[i][j-2]
+                j-=1
+            score += 2
+            for i in range(4):
+                blue[i][0] = 0
+                blue[i][1] = 0
+
+            break
+        # 빈칸 한 줄
+        elif d_list[j] :
+            while j-1 >=0:
+                for i in range(4):
+                    blue[i][j] = blue[i][j-1]
+                j-=1
+            score += 1
+            for i in range(4):
+                blue[i][0] = 0
+            break
+
+    # 연한 칸에 블록 있는지 확인
+    len = 0
+    for j in range(0,2):
+        flag = 0
+        for i in range(4):
+            if blue[i][j] == 1:
+                flag = 1
+                break
+        if flag == 1:
+            len += 1
+
+    if len >0 :
+        j = 5
+        while j - len >=0:
+            for i in range(4):
+                blue[i][j] = blue[i][j-len]
+            j-=1
+
+
+        # 연한 칸에 있는 블록 지우기
+        for i in range(4):
+            blue[i][0] = 0
+            blue[i][1] = 0
+
+
+
+
+def g_place(size, r, c):
+    global score
+    # 블록 놓기
+    if size == 1 :
+        i = down(c)
+        green[i][c] = 1
+    # 가로
+    elif size == 2:
+        l_i = down(c)
+        r_i = down(c+1)
+        i = min(l_i, r_i)
+        green[i][c] = 1
+        green[i][c+1] = 1
+    ## 세로
+    else:
+        i = down(c)
+        green[i-1][c] = 1
+        green[i][c]=1
+
+    d_list = [False for _ in range(6)]
+    # 블록 지우고 점수 얻기
+    for i in range(5,1,-1):
+        flag = 1
+        for j in range(4):
+            if green[i][j] == 0 :
+                flag = 0
+                break
+        if flag == 1 :
+            d_list[i] = True
+
+        # 빈 칸이 있을 때
+    for i in range(5,1,-1):
+        # 빈칸 2줄
+        if d_list[i] and d_list[i-1] :
+            while i - 2 >= 0:
+                green[i] = green[i - 2]
+                i-=1
+            score += 2
+            green[0] = [0 for _ in range(4)]
+            green[1] = [0 for _ in range(4)]
+            break
+        elif d_list[i] :
+            while i-1 >=0 :
+                green[i] = green[i-1]
+                i-=1
+            score += 1
+            green[0] = [0 for _ in range(4)]
+            break
+
+
+    # 연한 칸에 블록 있는지 확인
+    len = 0
+    # print('len',len)
+    # pri(green)
+    for i in range(0,2):
+        if 1 in green[i]:
+            len += 1
+    # 블록 있다면 이동
+    # print('len',len)
+
+    if len > 0 :
+        i = 5
+        while i-len >= 0 :
+            green[i] = green[i-len]
+            i -= 1
+
+        green[0] = [0 for _ in range(4)]
+        green[1] = [0 for _ in range(4)]
+
+
+def place(size,r,c):
+    g_place(size,r,c)
+    # pri(green)
+    b_place(size,r,c)
+    # pri(blue)
+
+for l in range(k):
+    # print('round',l)
+    # size, r, c = f.readline().split()
+    size,r,c = input().split()
+    size = int(size)
+    r = int(r)
+    c = int(c)
+    place(size, r,c)
+
+def get_count():
+    block = 0
+    for i in range(2,6):
+        for j in range(4):
+            if green[i][j] == 1:
+                block += 1
+    for i in range(4):
+        for j in range(2,6):
+            if blue[i][j] == 1:
+                block+=1
+
+    return block
+print(score)
+print(get_count())
+
+# f.close()
