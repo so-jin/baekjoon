@@ -1,0 +1,63 @@
+def reverse(p):
+    result = ''
+    for i in range(len(p)):
+        if p[i] == ')':
+            result += '('
+        else:
+            result += ')'
+    return result
+    
+def split(p):
+    
+    if p == '':
+        return ''
+    que = []
+    op = 0
+    cl = 0
+    flag = 0
+    
+    if p[0] == '(':
+        op +=1
+        que.append('(')
+    else :
+        que.append(')')
+        cl += 1
+    i = 1
+    while op != cl and i < len(p):
+        if p[i] == '(':
+            op+=1
+            que.append('(')
+        else:
+            cl+=1
+            if len(que) > 0 and que[-1] == '(':
+                que.pop()
+            else:
+                que.append(')')
+        i+=1
+        
+    # 끝까지 탐색했고, 그 결과 올바른 괄호 문자열일 때
+    if i == len(p) and len(que) == 0:
+        # 전체가 올바른 문자열, return
+        return p
+    
+    # u가 올바른 문자열, v에 대해서 재귀 수행
+    if len(que)==0 :
+        return p[:i] + split(p[i:])
+    
+    # u가 균형잡힌 문자열, v에 대해서 재귀 수행
+    else:
+        result = split(p[i:])
+        st = '(' + result + ')'
+        
+        u_ = p[1:i-1]
+        st += reverse(u_)
+        
+        return st
+        
+        
+def solution(p):
+    answer = 0
+    result = split(p)
+       
+    answer = result
+    return answer
