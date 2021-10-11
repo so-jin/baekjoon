@@ -1,3 +1,4 @@
+# list에서 tuple로 바꾸니 문제가 풀림
 # f = open("in.txt","r")
 
 # num = int(f.readline())
