@@ -1,0 +1,76 @@
+# f = open("in.txt")
+
+# n, m, k_years = map(int, f.readline().split())
+n,m,k_years = map(int, input().split())
+arr = [[ 5 for _ in range(n)]for _ in range(n)]
+trees = [[[] for _ in range(n)] for _ in range(n)]
+
+add_food = []
+for i in range(n):
+    # add_food.append(list(map(int, f.readline().split())))
+    add_food.append(list(map(int, input().split())))
+
+for i in range(m):
+    # r, c, old = map(int, f.readline().split())
+    r,c,old = map(int, input().split())
+    trees[r-1][c-1].append(old)
+
+def pri(arr):
+    for i in range(len(arr)):
+        print(arr[i])
+
+for year in range(k_years):
+
+    # # 봄에는 나이만큼 양분 먹기, 여름에는 나무가 양분으로 버리기
+    for i in range(n):
+        for j in range(n):
+            if trees[i][j] != []:
+                trees[i][j].sort()
+                tree_in = trees[i][j]
+                die = 0
+                food = 0
+                for k in range(len(tree_in)):
+                    if arr[i][j] >= tree_in[k]:
+                        arr[i][j] -= tree_in[k]
+                        tree_in[k] += 1
+                        die = k+1
+                    else:
+                        food += tree_in[k] // 2
+
+                arr[i][j] += food
+                del tree_in[die:]
+
+    # 1 2 3
+    # 4   5
+    # 6 7 8
+    dx = [-1,-1,-1,0,0,1,1,1]
+    dy = [-1,0,1,-1,1,-1,0,1]
+
+    for i in range(n):
+        for j in range(n):
+            tree_in =  trees[i][j]
+            for k in range(len(tree_in)):
+                #  번식
+                if tree_in[k] % 5 == 0:
+                    for d in range(8):
+                        x = i+dx[d]
+                        y = j+dy[d]
+
+                        if x<0 or y<0 or x>=n or y>=n :
+                            continue
+
+                        trees[x][y].append(1)
+
+
+#     겨울에는 양분 쿠가
+    for i in range(n):
+        for j in range(n):
+            arr[i][j] += add_food[i][j]
+
+# pri(trees)
+
+cnt = 0
+for i in range(n):
+    for j in range(n):
+        cnt += len(trees[i][j])
+print(cnt)
